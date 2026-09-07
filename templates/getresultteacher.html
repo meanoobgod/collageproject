@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if test_id %}
+        <title>Result {{ test_id}}</title>
+    {% else %}
+        <title>Results</title>
+    {% endif %}
+</head>
+<body>
+    <div>
+        <div name="form" method="GET">
+            <form>
+                <label>Test ID</label>
+                <input type="text" id="Test Id" name="test_id" placeholder="eg. ABCDEF">
+                <input type="submit" value="submit">
+            </form>
+        </div>
+        {% if student_results %}
+            {% for i in student_results %}
+                {{ i["rollno"] }} {{ i["score"] }}<br>
+            {% endfor %}
+        {% endif%}
+    </div>
+</body>
+<script>
+    const testbox = document.getElementById("Test Id");
+    const pram = new URLSearchParams(window.location.search);
+    const test_id = pram.get("test_id");
+    if (test_id != null){
+        testbox.value = test_id;
+    }
+</script>
+</html>

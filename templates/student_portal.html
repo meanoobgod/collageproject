@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><title>Student Login</title></head>
+<body>
+    <h2>Student Exam Login</h2>
+    <form method="POST">
+        <label>Your Rollno:</label><br>
+        <input type="text" name="student_name" id="student_name" required><br><br>
+        
+        <label>Paper ID (Ask your teacher):</label><br>
+        <input type="text" name="paper_id" id="paper_id" required><br><br>
+        
+        <button type="submit">Enter Exam</button>
+    </form>
+    
+</body>
+<script>
+        const params = new URLSearchParams(window.location.search);
+        
+        document.getElementById("paper_id").value =
+            params.get("paper_id") || "";
+        document.getElementById("student_name").value =
+            params.get("student_name") || "";
+    </script>
+</html>

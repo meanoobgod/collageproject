@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head><title>Create Question Paper</title></head>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/new_paper.css') }}">
+<body>
+    <h2>Create a Descriptive Question Paper</h2>
+    <div id="Global-Question-Paper-Form">
+        <form method="POST">
+            <label>Paper Title / Subject:</label><br>
+            <input type="text" name="title" required placeholder="e.g., Final History Exam"><br>
+            
+
+            <div id="questions-container">
+                <div class="Question-Body">
+                    <label>Question 1:</label><br>
+                    <textarea name="questions[1][question]" rows="6" cols="50" required placeholder="Question here"></textarea><br>
+                    <textarea name="questions[1][answer]" rows="6" cols="50" required placeholder="Answer here"></textarea>
+                    <button type="button" class="Delete-Question">Delete</button><br>
+                </div>
+            </div>
+
+            <button type="button" name="Add-New-Question" id="Add-New-Question">Add</button>
+            <button type="submit">Save Question Paper</button>
+        </form>
+    </div>
+
+    <script>
+        const container = document.getElementById("questions-container");
+        const addButton = document.getElementById("Add-New-Question");
+
+        addButton.addEventListener("click", function() {
+            const index = container.children.length;
+
+            const question = document.createElement("div");
+            question.className = "Question-Body";
+
+            question.innerHTML = `
+                <label>Question ${index + 1}:</label><br>
+                <textarea name="questions[${index + 1}][question]" rows="6" cols="50" required placeholder="Question here"></textarea><br>
+                <textarea name="questions[${index + 1}][answer]" rows="6" cols="50" required placeholder="Answer here"></textarea>
+                <button type="button" class="Delete-Question">Delete</button><br>
+            `;
+
+            container.appendChild(question);
+        });
+
+        container.addEventListener("click", function(e) {
+            if (e.target.classList.contains("Delete-Question")) {
+                if (container.children.length > 1) {
+                    e.target.parentElement.remove();
+
+                    [...container.children].forEach((div, index) => {
+                        div.querySelector("label").innerHTML = `Question ${index + 1}`;
+                        div.querySelector("textarea[name*='question']").name = `questions[${index + 1}][question]`;
+                        div.querySelector("textarea[name*='answer']").name = `questions[${index + 1}][answer]`;
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

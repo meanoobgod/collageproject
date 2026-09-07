@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><title>Exam: {{ paper_title }}</title></head>
+<body>
+    <h2>{{ paper_title }}</h2>
+    <p><b>Student:</b> {{ student_name }}</p>
+    <hr>
+    
+    <form method="POST">
+        {% for q in Question %}
+            <p><b>Question: {{ q["question_no"] }}</b></p>
+            <p>{{ q["question"] }}</p>
+            <label><b>Answer {{ q["question_no"] }}:</b></label><br>
+            <textarea id="{{ paper_id }}:{{ q['question_no'] }}" name="{{ paper_id }}:{{ q['question_no'] }}" rows="10" cols="60" required placeholder="Type your descriptive answer here..."></textarea><br><br>
+        {% endfor %}
+        
+        <button type="submit">Submit Exam</button>
+    </form>
+</body>
+</html>
