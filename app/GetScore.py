@@ -5,7 +5,7 @@ import onnxruntime as ort
 from tokenizers import Tokenizer
 
 # 1. Load Tokenizer and ONNX Session directly
-model_dir = r"./model/"
+model_dir = r"collageproject/app/model"
 
 tokenizer = Tokenizer.from_file(os.path.join(model_dir, "tokenizer.json"))
 
