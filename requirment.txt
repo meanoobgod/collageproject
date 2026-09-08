@@ -1,0 +1,7 @@
+light_embed;
+onnxruntime;
+onnx;
+onnxscript;
+brotli;
+transformers;
+torch;
