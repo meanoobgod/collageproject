@@ -22,7 +22,7 @@
         </div>
         {% if student_results %}
             <label>You scored</label>
-            {{ student_results}}
+            {{ student_results[0]["score"] }}
         {% endif%}
     </div>
 </body>
