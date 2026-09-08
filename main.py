@@ -1,6 +1,7 @@
 import os
 import uuid
-from datetime import datetime
+# FIX 1: Added timezone to the imports
+from datetime import datetime, timezone
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
@@ -9,8 +10,8 @@ from sqlalchemy import text
 from app.GetScore import getScore
 
 app = Flask(__name__)
+
 # --- PostgreSQL Database Configuration ---
-# Look up your prefixed Vercel / Neon environment variables
 DATABASE_URL = (
     os.environ.get("CollageProject_POSTGRES_URL")
     or os.environ.get("CollageProject_POSTGRES_URL_NON_POOLING")
@@ -18,12 +19,10 @@ DATABASE_URL = (
 )
 
 if DATABASE_URL:
-    # Convert 'postgres://' to 'postgresql://' for SQLAlchemy compatibility
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
     app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 else:
-    # Construct connection string from individual variables if needed
     user = os.environ.get("CollageProject_PGUSER", "postgres")
     password = os.environ.get("CollageProject_PGPASSWORD", "")
     host = os.environ.get("CollageProject_PGHOST", "localhost")
@@ -34,6 +33,12 @@ else:
     )
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# FIX 2: Prevents "MySQL/Postgres Server has gone away" errors in serverless environments
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
 
 db = SQLAlchemy(app)
 
@@ -106,7 +111,6 @@ with app.app_context():
 def index():
     return render_template("index.html")
 
-
 @app.route("/teacherspace")
 def teacherspace():
     return render_template("teacherspace.html")
@@ -117,33 +121,36 @@ def studentspace():
 
 @app.route("/teacherspace/getresult", methods=["GET"])
 def GetResultTeacher():
-    # Expects paper_id (the 6-character code) from the URL arguments
     arguments = dict(request.args)
     student_results = []
     if arguments.get("test_id"):
         paper_id = arguments.get("test_id")
-        student_results = db.session.execute(text("Select * from result where paper_id= :paper_id"), {"paper_id": paper_id}).mappings().all()
+        student_results = db.session.execute(
+            text("Select * from result where paper_id= :paper_id"), 
+            {"paper_id": paper_id}
+        ).mappings().all()
 
     return render_template(
         "getresultteacher.html", 
         student_results=student_results
-        )
-
+    )
 
 @app.route("/student/getresult", methods=["GET"])
 def GetResultStudent():
-    # Expects paper_id (the 6-character code) from the URL arguments
     arguments = dict(request.args)
     student_results = []
     if arguments.get("test_id") and arguments.get("rollno"):
         paper_id = arguments.get("test_id")
         rollno = arguments.get("rollno").lower()
-        student_results = db.session.execute(text("Select * from result where paper_id= :paper_id and rollno = :rollno"), {"paper_id": paper_id, "rollno": rollno}).mappings().all()
+        student_results = db.session.execute(
+            text("Select * from result where paper_id= :paper_id and rollno = :rollno"), 
+            {"paper_id": paper_id, "rollno": rollno}
+        ).mappings().all()
 
     return render_template(
         "getresultstudent.html", 
         student_results=student_results
-        )
+    )
 
 @app.route("/new", methods=["GET", "POST"])
 def newQuestionPaper():
@@ -162,7 +169,7 @@ def newQuestionPaper():
                 _id = f"{paper_id}:{index}"
 
                 question_entry = Question(
-                    id = _id,
+                    id=_id,
                     paper_id=paper_id,
                     question_no=int(index),
                     question_text=q_text,
@@ -180,7 +187,6 @@ def newQuestionPaper():
         )
 
     return render_template("new_paper.html")
-
 
 @app.route("/student", methods=["GET", "POST"])
 def student_portal():
@@ -206,7 +212,6 @@ def student_portal():
         "student_portal.html", student_name=student_name, paper_id=paper_id
     )
 
-
 @app.route("/exam/<paper_id>", methods=["GET", "POST"])
 def exam(paper_id):
     totalScore = 0
@@ -225,13 +230,11 @@ def exam(paper_id):
         db.session.flush()
 
         correct_answers = {q.id: q.correct_answer for q in questions_list}
-        #print(request.form.items)
+        
         for q_id, correct_ans in correct_answers.items():
-            #print(q_id)
             user_ans = request.form.get(str(q_id), "")
             calculated_score = getScore(user_ans, correct_ans)
             totalScore += calculated_score
-            #print(calculated_score)
 
             answer_entry = StudentAnswer(
                 submission_id=submission.id,
@@ -244,9 +247,11 @@ def exam(paper_id):
         result_entry = Result(rollno=student_name, score=totalScore/len(correct_answers.keys()), paper_id=paper_id)
         db.session.add(result_entry)
         db.session.commit()
+        
+        # FIX 3: Removed "saved to MySQL"
         return (
             f"<h3>Test Submitted!</h3>"
-            f"<p>Thank you, {student_name}. Your answers have been saved to MySQL.</p>"
+            f"<p>Thank you, {student_name}. Your answers have been successfully recorded.</p>"
             f"<a href='/'>Go Home</a>"
         )
 
@@ -266,7 +271,6 @@ def exam(paper_id):
         paper_title=paper.title,
         paper_id=paper_id,
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True)
