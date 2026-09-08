@@ -9,30 +9,44 @@ from sqlalchemy import text
 from app.GetScore import getScore
 
 app = Flask(__name__)
-
-# --- MySQL Database Configuration ---
-# Update credentials or pass them as environment variables
-DB_USER = os.environ.get("MYSQL_USER", "root")
-DB_PASS = os.environ.get("MYSQL_PASSWORD", "Rohit_2006")
-DB_HOST = os.environ.get("MYSQL_HOST", "localhost")
-DB_PORT = os.environ.get("MYSQL_PORT", "3306")
-DB_NAME = os.environ.get("MYSQL_DB", "collageproject")
-
-# Uses pymysql as the database driver
-app.config["SQLALCHEMY_DATABASE_URI"] = (
-    f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+# --- PostgreSQL Database Configuration ---
+# Look up your prefixed Vercel / Neon environment variables
+DATABASE_URL = (
+    os.environ.get("CollageProject_POSTGRES_URL")
+    or os.environ.get("CollageProject_POSTGRES_URL_NON_POOLING")
+    or os.environ.get("POSTGRES_URL")
 )
+
+if DATABASE_URL:
+    # Convert 'postgres://' to 'postgresql://' for SQLAlchemy compatibility
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+else:
+    # Construct connection string from individual variables if needed
+    user = os.environ.get("CollageProject_PGUSER", "postgres")
+    password = os.environ.get("CollageProject_PGPASSWORD", "")
+    host = os.environ.get("CollageProject_PGHOST", "localhost")
+    dbname = os.environ.get("CollageProject_PGDATABASE", "collageproject")
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = (
+        f"postgresql://{user}:{password}@{host}/{dbname}?sslmode=require"
+    )
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
 # --- Database Models ---
-
 class Paper(db.Model):
     __tablename__ = "papers"
     paper_id = db.Column(db.String(6), primary_key=True)
     title = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False
+    )
 
     questions = db.relationship("Question", backref="paper", cascade="all, delete-orphan")
     submissions = db.relationship("Submission", backref="paper", cascade="all, delete-orphan")
@@ -54,7 +68,11 @@ class Submission(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     paper_id = db.Column(db.String(6), db.ForeignKey("papers.paper_id"), nullable=False)
     student_name = db.Column(db.String(255), nullable=False)
-    submitted_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    submitted_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False
+    )
 
     answers = db.relationship("StudentAnswer", backref="submission", cascade="all, delete-orphan")
 
@@ -67,6 +85,7 @@ class StudentAnswer(db.Model):
     submitted_answer = db.Column(db.Text, nullable=True)
     score = db.Column(db.Float, nullable=False)
 
+
 class Result(db.Model):
     __tablename__ = "result"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -74,9 +93,12 @@ class Result(db.Model):
     score = db.Column(db.Float, nullable=False)
     paper_id = db.Column(db.String(6))
 
-# Initialize tables in MySQL database
+# Safe table creation for serverless runtimes
 with app.app_context():
-    db.create_all()
+    try:
+        db.create_all()
+    except Exception as e:
+        print(f"Table creation warning: {e}")
 
 # --- Routes ---
 
