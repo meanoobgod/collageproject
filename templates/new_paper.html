@@ -1,28 +1,40 @@
 <!DOCTYPE html>
 <html>
-<head><title>Create Question Paper</title></head>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/new_paper.css') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/new_paper.css') }}">
+    <title>Create Question Paper</title>
+</head>
 <body>
-    <h2>Create a Descriptive Question Paper</h2>
-    <div id="Global-Question-Paper-Form">
-        <form method="POST">
-            <label>Paper Title / Subject:</label><br>
-            <input type="text" name="title" required placeholder="e.g., Final History Exam"><br>
-            
+    <img id="background" src="{{ url_for('static', filename='photos/horizontal-background-2.jpg') }}">
+    <nav>
+        <a href="/">Home</a>
+    </nav>
+    <main>
+        <div id="Global-Question-Paper-Form">
+            <h2>Create a Descriptive Question Paper</h2>
+            <form method="POST">
+                <label>Paper Title / Subject:</label>
+                <input type="text" name="title" required placeholder="e.g., Final History Exam">
 
-            <div id="questions-container">
-                <div class="Question-Body">
-                    <label>Question 1:</label><br>
-                    <textarea name="questions[1][question]" rows="6" cols="50" required placeholder="Question here"></textarea><br>
-                    <textarea name="questions[1][answer]" rows="6" cols="50" required placeholder="Answer here"></textarea>
-                    <button type="button" class="Delete-Question">Delete</button><br>
+                <div id="questions-container">
+                    <div class="Question-Body">
+                        <label>Question 1:</label>
+                        <textarea name="questions[1][question]" rows="6" cols="50" required placeholder="Question here"></textarea>
+                        <textarea name="questions[1][answer]" rows="6" cols="50" required placeholder="Answer here"></textarea>
+                        <button type="button" class="Delete-Question">Delete</button>
+                    </div>
                 </div>
-            </div>
 
-            <button type="button" name="Add-New-Question" id="Add-New-Question">Add</button>
-            <button type="submit">Save Question Paper</button>
-        </form>
-    </div>
+                <div class="Question-Paper-Actions">
+                    <button type="button" name="Add-New-Question" id="Add-New-Question">Add Question</button>
+                    <button type="submit">Save Question Paper</button>
+                </div>
+            </form>
+        </div>
+    </main>
 
     <script>
         const container = document.getElementById("questions-container");
@@ -35,10 +47,10 @@
             question.className = "Question-Body";
 
             question.innerHTML = `
-                <label>Question ${index + 1}:</label><br>
-                <textarea name="questions[${index + 1}][question]" rows="6" cols="50" required placeholder="Question here"></textarea><br>
+                <label>Question ${index + 1}:</label>
+                <textarea name="questions[${index + 1}][question]" rows="6" cols="50" required placeholder="Question here"></textarea>
                 <textarea name="questions[${index + 1}][answer]" rows="6" cols="50" required placeholder="Answer here"></textarea>
-                <button type="button" class="Delete-Question">Delete</button><br>
+                <button type="button" class="Delete-Question">Delete</button>
             `;
 
             container.appendChild(question);
