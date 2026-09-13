@@ -1,0 +1,97 @@
+/* new_paper.css
+   Styles the question-paper builder. Link this AFTER common.css so it can
+   override the no-scroll body rule (this page's content grows as questions
+   are added).
+*/
+
+body {
+    overflow: auto;
+}
+
+#Global-Question-Paper-Form {
+    max-width: 700px;
+    margin: 60px auto;
+    background-color: rgba(255, 255, 255, 0.6);
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 30px 40px;
+    box-sizing: border-box;
+}
+
+#Global-Question-Paper-Form h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+#Global-Question-Paper-Form label {
+    display: block;
+    font-weight: bold;
+    margin: 10px 0 4px;
+}
+
+#Global-Question-Paper-Form input[type="text"],
+#Global-Question-Paper-Form textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid black;
+    border-radius: 6px;
+    font-size: 16px;
+    font-family: inherit;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+.Question-Body {
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.Question-Body textarea {
+    margin-bottom: 10px;
+}
+
+.Delete-Question {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid black;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.Delete-Question:hover {
+    transform: scale(1.05);
+}
+
+.Question-Paper-Actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.Question-Paper-Actions button {
+    padding: 10px 24px;
+    border: 1px solid black;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.8);
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.Question-Paper-Actions button:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 414px) {
+    #Global-Question-Paper-Form {
+        margin: 20px 10px;
+        padding: 20px;
+    }
+}

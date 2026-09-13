@@ -1,0 +1,120 @@
+/* form.css
+   Shared styling for content/form pages: student_portal, getresultteacher,
+   getresultstudent, exam. Link this AFTER common.css so these rules can
+   override common.css's fixed-height, no-scroll `main`/`body` layout
+   (which was built for the two square link-cards on teacherspace/studentspace).
+*/
+
+body {
+    overflow: auto;
+}
+
+main {
+    height: auto;
+    min-height: 100vh;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 60px 20px 40px;
+    box-sizing: border-box;
+    gap: 20px;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.6);
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 30px 40px;
+    width: 90%;
+    max-width: 480px;
+    box-sizing: border-box;
+}
+
+.card.exam-card {
+    max-width: 700px;
+}
+
+.card h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.card form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.card label {
+    font-weight: bold;
+}
+
+.card input[type="text"],
+.card textarea {
+    padding: 8px 10px;
+    border: 1px solid black;
+    border-radius: 6px;
+    font-size: 16px;
+    font-family: inherit;
+    box-sizing: border-box;
+    width: 100%;
+    resize: vertical;
+}
+
+.card button,
+.card input[type="submit"] {
+    align-self: center;
+    padding: 10px 24px;
+    border: 1px solid black;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.8);
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.card button:hover,
+.card input[type="submit"]:hover {
+    transform: scale(1.05);
+}
+
+.result-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.result-list li {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    padding: 6px 4px;
+}
+
+.result-score {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.question-block {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.question-block:last-of-type {
+    border-bottom: none;
+}
+
+@media (max-width: 414px) {
+    .card {
+        padding: 20px;
+        width: 95%;
+    }
+}
