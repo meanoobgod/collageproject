@@ -4,6 +4,43 @@
    are added).
 */
 
+body {
+    margin: 0;
+    height: 100vh;
+    margin: 3%;
+    margin-top: 3px;
+}
+
+#background {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    filter: blur(5px);
+    z-index: -1;
+}
+
+main {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+
+nav a{
+    z-index: 99;
+    position: relative;
+    top: 5%;
+    left: 5%;
+    text-decoration: underline;
+    color: black;
+}
+
 
 #Global-Question-Paper-Form {
     max-width: 700px;
@@ -90,5 +127,11 @@
     #Global-Question-Paper-Form {
         margin: 20px 10px;
         padding: 20px;
+    }
+    body{
+        margin: 1px;
+    }
+    main{
+        flex-direction: column;
     }
 }
