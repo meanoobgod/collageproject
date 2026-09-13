@@ -28,8 +28,10 @@
             </form>
             {% if student_results %}
                 <p class="result-score">You scored
-                i["score"]
+                {{ i["score"] }}
                 </p>
+            {% else %}
+             <p class="result-score">No record found</p>p
             {% endif%}
         </div>
     </main>
