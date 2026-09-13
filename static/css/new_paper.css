@@ -4,9 +4,6 @@
    are added).
 */
 
-body {
-    overflow: auto;
-}
 
 #Global-Question-Paper-Form {
     max-width: 700px;
