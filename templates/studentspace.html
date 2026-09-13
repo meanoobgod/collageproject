@@ -1,12 +1,31 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <title>Student Space</title>
 </head>
 <body>
-    <li><a href="/student">Give Exam</a></li>
-    <li><a href="/student/getresult">Get Result</a></li>
+    <img id="background" src="{{ url_for('static', filename='photos/horizontal-background-2.jpg') }}">
+    <nav>
+        <a href="/">Home</a>
+    </nav>
+    <main>
+        <div class="link">
+            <a href="/student">Give Exam</a>
+        </div>
+        <div class="link">
+            <a href="/student/getresult">Get Result</a>
+        </div>
+    </main>
 </body>
+<script>
+    document.querySelectorAll(".link").forEach(div => {
+        div.addEventListener("click", () => {
+            div.querySelector("a").click();
+        });
+    });
+</script>
 </html>
