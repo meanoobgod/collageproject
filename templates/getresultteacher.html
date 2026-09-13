@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
     {% if test_id %}
         <title>Result {{ test_id}}</title>
     {% else %}
@@ -10,20 +12,28 @@
     {% endif %}
 </head>
 <body>
-    <div>
-        <div name="form" method="GET">
+    <img id="background" src="{{ url_for('static', filename='photos/horizontal-background-2.jpg') }}">
+    <nav>
+        <a href="/">Home</a>
+    </nav>
+    <main>
+        <div class="card">
+            <h2>Get Result</h2>
             <form>
                 <label>Test ID</label>
                 <input type="text" id="Test Id" name="test_id" placeholder="eg. ABCDEF">
-                <input type="submit" value="submit">
+                <input type="submit" value="Submit">
             </form>
+
+            {% if student_results %}
+                <ul class="result-list">
+                {% for i in student_results %}
+                    <li><span>{{ i["rollno"] }}</span><span>{{ i["score"] }}</span></li>
+                {% endfor %}
+                </ul>
+            {% endif%}
         </div>
-        {% if student_results %}
-            {% for i in student_results %}
-                {{ i["rollno"] }} {{ i["score"] }}<br>
-            {% endfor %}
-        {% endif%}
-    </div>
+    </main>
 </body>
 <script>
     const testbox = document.getElementById("Test Id");
