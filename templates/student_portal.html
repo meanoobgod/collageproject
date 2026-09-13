@@ -1,18 +1,31 @@
 <!DOCTYPE html>
-<html>
-<head><title>Student Login</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
+    <title>Student Login</title>
+</head>
 <body>
-    <h2>Student Exam Login</h2>
-    <form method="POST">
-        <label>Your Rollno:</label><br>
-        <input type="text" name="student_name" id="student_name" required><br><br>
-        
-        <label>Paper ID (Ask your teacher):</label><br>
-        <input type="text" name="paper_id" id="paper_id" required><br><br>
-        
-        <button type="submit">Enter Exam</button>
-    </form>
-    
+    <img id="background" src="{{ url_for('static', filename='photos/horizontal-background-2.jpg') }}">
+    <nav>
+        <a href="/">Home</a>
+    </nav>
+    <main>
+        <div class="card">
+            <h2>Student Exam Login</h2>
+            <form method="POST">
+                <label>Your Rollno:</label>
+                <input type="text" name="student_name" id="student_name" required>
+
+                <label>Paper ID (Ask your teacher):</label>
+                <input type="text" name="paper_id" id="paper_id" required>
+
+                <button type="submit">Enter Exam</button>
+            </form>
+        </div>
+    </main>
 </body>
 <script>
         const params = new URLSearchParams(window.location.search);
