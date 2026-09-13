@@ -1,11 +1,25 @@
 <!DOCTYPE html>
 <html>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <head><title>Exam Portal</title></head>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 <body>
-    <h1>Welcome to the Exam Portal</h1>
-    <ul>
-        <li><a href="/teacherspace">Teacher</a></li>
-        <li><a href="/studentspace">Student</a></li>
-    </ul>
+    <img id="background" src="{{ url_for('static', filename='photos/horizontal-background-2.jpg') }}">
+    <main>
+        <div id="Teacher-Space">
+            <a href="/teacherspace">Teacher</a>
+        </div>
+        <div id="Student-Space">
+            <a href="/studentspace">Student</a>
+        </div>
+    </main>
 </body>
+<script>
+    document.querySelectorAll("#Teacher-Space, #Student-Space").forEach(div => {
+        div.addEventListener("click", () => {
+            div.querySelector("a").click();
+        });
+    });
+</script>
 </html>
