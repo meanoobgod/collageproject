@@ -1,20 +1,33 @@
 <!DOCTYPE html>
-<html>
-<head><title>Exam: {{ paper_title }}</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
+    <title>Exam: {{ paper_title }}</title>
+</head>
 <body>
-    <h2>{{ paper_title }}</h2>
-    <p><b>Student:</b> {{ student_name }}</p>
-    <hr>
-    
-    <form method="POST">
-        {% for q in Question %}
-            <p><b>Question: {{ q["question_no"] }}</b></p>
-            <p>{{ q["question"] }}</p>
-            <label><b>Answer {{ q["question_no"] }}:</b></label><br>
-            <textarea id="{{ paper_id }}:{{ q['question_no'] }}" name="{{ paper_id }}:{{ q['question_no'] }}" rows="10" cols="60" required placeholder="Type your descriptive answer here..."></textarea><br><br>
-        {% endfor %}
-        
-        <button type="submit">Submit Exam</button>
-    </form>
+    <img id="background" src="{{ url_for('static', filename='photos/horizontal-background-2.jpg') }}">
+    <main>
+        <div class="card exam-card">
+            <h2>{{ paper_title }}</h2>
+            <p><b>Student:</b> {{ student_name }}</p>
+            <hr>
+
+            <form method="POST">
+                {% for q in Question %}
+                    <div class="question-block">
+                        <p><b>Question: {{ q["question_no"] }}</b></p>
+                        <p>{{ q["question"] }}</p>
+                        <label><b>Answer {{ q["question_no"] }}:</b></label>
+                        <textarea id="{{ paper_id }}:{{ q['question_no'] }}" name="{{ paper_id }}:{{ q['question_no'] }}" rows="10" cols="60" required placeholder="Type your descriptive answer here..."></textarea>
+                    </div>
+                {% endfor %}
+
+                <button type="submit">Submit Exam</button>
+            </form>
+        </div>
+    </main>
 </body>
 </html>
