@@ -58,12 +58,13 @@ nav a{
 }
 
 #Global-Question-Paper-Form label {
-    display: block;
+    display: inline;
     font-weight: bold;
     margin: 10px 0 4px;
 }
 
 #Global-Question-Paper-Form input[type="text"],
+#Global-Question-Paper-Form input[type="password"],
 #Global-Question-Paper-Form textarea {
     width: 100%;
     padding: 8px 10px;
@@ -75,6 +76,29 @@ nav a{
     resize: vertical;
 }
 
+#paper-meta-data{
+    border: 1px solid black;
+    border-radius: 6px;
+    padding: 3%;
+}
+
+#paper-meta-data label, input{
+    display: inline;
+    font-weight: bold;
+    margin: 10px 0 4px;
+    margin-left: 3%;
+}
+
+#paper-meta-data input[type="text"],
+#paper-meta-data input[type="password"]{
+    width: 50%;
+}
+
+#paper-meta-data input[type="date"],
+#paper-meta-data input[type="time"]{
+    width: 20%;
+}
+
 .Question-Body {
     border: 1px solid rgba(0, 0, 0, 0.3);
     border-radius: 8px;
@@ -83,8 +107,29 @@ nav a{
     background-color: rgba(255, 255, 255, 0.4);
 }
 
+
 .Question-Body textarea {
     margin-bottom: 10px;
+}
+
+.Question-Body input[type="number"]{
+    width: 10%;
+}
+
+.Question-Body input[type="number"]::-webkit-outer-spin-button,
+.Question-Body input[type="number"]::-webkit-inner-spin-button{
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.Question-Body input[type="number"]{
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.question-image{
+    display: inline;
+    align-self: flex-end;
 }
 
 .Delete-Question {
