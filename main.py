@@ -133,7 +133,10 @@ def GetResultTeacher():
                 "getresultteacher.html", 
                 student_results=student_results
                 )
-    return "<h1 style='background: black; color: white;'>No Record found Found, either the paper id is invalid or you forgot your password</h1>"
+    return render_template(
+                "getresultteacher.html", 
+                student_results=student_results
+                )
 
 
 @app.route("/student/getresult", methods=["GET"])
