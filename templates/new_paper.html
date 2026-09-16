@@ -12,11 +12,11 @@
             <div id="paper-meta-data">
                 <label>Paper Title / Subject:</label> <input type="text" name="title" required placeholder="e.g., Final Exam"><br>
                 <label>Password:</label> <input type="password" name="password" required placeholder="Password"><br>
-                <label>Time limit:</label> <input type="date" name="timelimitdate"> <input type="time", name="timelimittime"><br>
+                <label>Time limit:</label> <input type="date" name="timelimitdate"><label><i>Default is 2 days from today</i></label><br>
             </div>
             <div id="questions-container">
                 <div class="Question-Body">
-                    <label>Question 1:</label> <input type="number" name="questions[1][marks]" required value=1> Marks<br>
+                    <label>Question 1:</label> <input type="number" name="questions[1][marks]" required value=1 min="0"> Marks<br>
                     <textarea name="questions[1][question]" rows="6" cols="50" required placeholder="Question here"></textarea><br>
                     <textarea name="questions[1][answer]" rows="6" cols="50" required placeholder="Answer here"></textarea>
                     <button type="button" class="Delete-Question">Delete</button><br>
@@ -39,7 +39,7 @@
             question.className = "Question-Body";
 
             question.innerHTML = `
-                <label>Question ${index + 1}:</label> <input type="number" name="questions[${index + 1}][marks]" required value=1> Marks<br>
+                <label>Question ${index + 1}:</label> <input type="number" name="questions[${index + 1}][marks]" required value=1 min="0"> Marks<br>
                 <textarea name="questions[${index + 1}][question]" rows="6" cols="50" required placeholder="Question here"></textarea><br>
                 <textarea name="questions[${index + 1}][answer]" rows="6" cols="50" required placeholder="Answer here"></textarea>
                 <button type="button" class="Delete-Question">Delete</button><br>
