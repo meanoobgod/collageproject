@@ -1,7 +1,7 @@
 import os
 import uuid
 # FIX 1: Added timezone to the imports
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
@@ -160,8 +160,12 @@ def newQuestionPaper():
         paper_id = str(uuid.uuid4())[:6].upper()
         title = request.form.get("title")
         password = request.form.get("password")
-        timelimitdate = request.form.get("timelimitdate").split("-")
-        timelimitdate = date(year=int(timelimitdate[0]), month=int(timelimitdate[1]), day=int(timelimitdate[2]))
+        timelimitdate = request.form.get("timelimitdate")
+        if timelimitate:
+            timelimitdate = request.form.get("timelimitdate").split("-")
+            timelimitdate = date(year=int(timelimitdate[0]), month=int(timelimitdate[1]), day=int(timelimitdate[2]))
+        else:
+            timelimitdate = None
         new_paper = Paper(paper_id=paper_id, title=title, password= password, Date_limit= timelimitdate)
         db.session.add(new_paper)
 
