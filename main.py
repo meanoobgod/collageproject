@@ -46,7 +46,7 @@ db = SQLAlchemy(app)
 class Paper(db.Model):
     __tablename__ = "papers"
     paper_id = db.Column(db.String(6), primary_key=True)
-    password = db.Column(db.String(6), nullable= False)
+    password = db.Column(db.String(255), nullable= False)
     title = db.Column(db.String(255), nullable=False)
     created_at = db.Column(
         db.DateTime,
