@@ -46,16 +46,16 @@ db = SQLAlchemy(app)
 class Paper(db.Model):
     __tablename__ = "papers"
     paper_id = db.Column(db.String(6), primary_key=True)
+    password = db.Column(db.String(6), nullable= False)
     title = db.Column(db.String(255), nullable=False)
     created_at = db.Column(
         db.DateTime,
         default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
-
+    Date_limit = db.Column(db.Date, default= datetime.now().date() + timedelta(days=2))
     questions = db.relationship("Question", backref="paper", cascade="all, delete-orphan")
     submissions = db.relationship("Submission", backref="paper", cascade="all, delete-orphan")
-
 
 class Question(db.Model):
     __tablename__ = "questions"
@@ -64,6 +64,7 @@ class Question(db.Model):
     question_no = db.Column(db.Integer, nullable=False)
     question_text = db.Column(db.Text, nullable=False)
     correct_answer = db.Column(db.Text, nullable=False)
+    marks = db.Column(db.Integer, nullable=False)
 
     student_answers = db.relationship("StudentAnswer", backref="question", cascade="all, delete-orphan")
 
@@ -105,11 +106,11 @@ with app.app_context():
     except Exception as e:
         print(f"Table creation warning: {e}")
 
-# --- Routes ---
 
 @app.route("/")
 def index():
     return render_template("index.html")
+
 
 @app.route("/teacherspace")
 def teacherspace():
@@ -121,44 +122,47 @@ def studentspace():
 
 @app.route("/teacherspace/getresult", methods=["GET"])
 def GetResultTeacher():
+    # Expects paper_id (the 6-character code) from the URL arguments
     arguments = dict(request.args)
     student_results = []
     if arguments.get("test_id"):
         paper_id = arguments.get("test_id")
-        student_results = db.session.execute(
-            text("Select * from result where paper_id= :paper_id"), 
-            {"paper_id": paper_id}
-        ).mappings().all()
+        password = arguments.get("password")
+        paper_list = (Paper.query.filter_by(paper_id=paper_id, password= password).all())
+        if(len(paper_list) == 0):
+            return "<h1 style='background: black; color: white;'>No Record found Found, either the paper id is invalid or you forgot your password</h1>"
+        else:
+            student_results = db.session.execute(text("Select * from result where paper_id= :paper_id"), {"paper_id": paper_id}).mappings().all()
+            return render_template(
+                "getresultteacher.html", 
+                student_results=student_results
+                )
 
-    return render_template(
-        "getresultteacher.html", 
-        student_results=student_results
-    )
 
 @app.route("/student/getresult", methods=["GET"])
 def GetResultStudent():
+    # Expects paper_id (the 6-character code) from the URL arguments
     arguments = dict(request.args)
     student_results = []
     if arguments.get("test_id") and arguments.get("rollno"):
         paper_id = arguments.get("test_id")
         rollno = arguments.get("rollno").lower()
-        student_results = db.session.execute(
-            text("Select * from result where paper_id= :paper_id and rollno = :rollno"), 
-            {"paper_id": paper_id, "rollno": rollno}
-        ).mappings().all()
+        student_results = db.session.execute(text("Select * from result where paper_id= :paper_id and rollno = :rollno"), {"paper_id": paper_id, "rollno": rollno}).mappings().all()
 
     return render_template(
         "getresultstudent.html", 
         student_results=student_results
-    )
+        )
 
 @app.route("/new", methods=["GET", "POST"])
 def newQuestionPaper():
     if request.method == "POST":
         paper_id = str(uuid.uuid4())[:6].upper()
         title = request.form.get("title")
-
-        new_paper = Paper(paper_id=paper_id, title=title)
+        password = request.form.get("password")
+        timelimitdate = request.form.get("timelimitdate").split("-")
+        timelimitdate = date(year=int(timelimitdate[0]), month=int(timelimitdate[1]), day=int(timelimitdate[2]))
+        new_paper = Paper(paper_id=paper_id, title=title, password= password, Date_limit= timelimitdate)
         db.session.add(new_paper)
 
         for key in request.form:
@@ -167,13 +171,15 @@ def newQuestionPaper():
                 q_text = request.form.get(f"questions[{index}][question]")
                 ans_text = request.form.get(f"questions[{index}][answer]")
                 _id = f"{paper_id}:{index}"
+                marks = request.form.get(f"questions[{index}][marks]")
 
                 question_entry = Question(
-                    id=_id,
+                    id = _id,
                     paper_id=paper_id,
                     question_no=int(index),
                     question_text=q_text,
                     correct_answer=ans_text,
+                    marks = marks
                 )
                 db.session.add(question_entry)
 
@@ -187,6 +193,7 @@ def newQuestionPaper():
         )
 
     return render_template("new_paper.html")
+
 
 @app.route("/student", methods=["GET", "POST"])
 def student_portal():
@@ -212,9 +219,10 @@ def student_portal():
         "student_portal.html", student_name=student_name, paper_id=paper_id
     )
 
+
 @app.route("/exam/<paper_id>", methods=["GET", "POST"])
 def exam(paper_id):
-    totalScore = 0
+    studentScore = 0
     student_name = request.args.get("student_name")
     paper = Paper.query.get_or_404(paper_id)
 
@@ -228,30 +236,33 @@ def exam(paper_id):
         submission = Submission(paper_id=paper_id, student_name=student_name)
         db.session.add(submission)
         db.session.flush()
-
-        correct_answers = {q.id: q.correct_answer for q in questions_list}
-        
+        print(request.form)
+        correct_answers = {q.id: (q.correct_answer, q.marks) for q in questions_list}
+        #print(request.form.items)
         for q_id, correct_ans in correct_answers.items():
+            #print(q_id)
             user_ans = request.form.get(str(q_id), "")
-            calculated_score = getScore(user_ans, correct_ans)
-            totalScore += calculated_score
+            calculated_score = getScore(user_ans, correct_ans[0])
+            if(calculated_score >= 0.85):
+                studentScore += correct_ans[1]
+            else:
+                studentScore += 0
+            #print(calculated_score)
 
             answer_entry = StudentAnswer(
                 submission_id=submission.id,
                 question_id=q_id,
                 submitted_answer=user_ans,
-                score=calculated_score,
+                score=studentScore,
             )
             db.session.add(answer_entry)
 
-        result_entry = Result(rollno=student_name, score=totalScore/len(correct_answers.keys()), paper_id=paper_id)
+        result_entry = Result(rollno=student_name, score=studentScore, paper_id=paper_id)
         db.session.add(result_entry)
         db.session.commit()
-        
-        # FIX 3: Removed "saved to MySQL"
         return (
             f"<h3>Test Submitted!</h3>"
-            f"<p>Thank you, {student_name}. Your answers have been successfully recorded.</p>"
+            f"<p>Thank you, {student_name}. Your answers have been saved to the database.</p>"
             f"<a href='/'>Go Home</a>"
         )
 
@@ -260,6 +271,7 @@ def exam(paper_id):
             "question_id": q.id,
             "question": q.question_text,
             "question_no": q.question_no,
+            "marks" : q.marks,
         }
         for q in questions_list
     ]
@@ -271,6 +283,7 @@ def exam(paper_id):
         paper_title=paper.title,
         paper_id=paper_id,
     )
+
 
 if __name__ == "__main__":
     app.run(debug=True)
