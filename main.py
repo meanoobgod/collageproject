@@ -100,18 +100,7 @@ class Result(db.Model):
     paper_id = db.Column(db.String(6))
 
 # Safe table creation for serverless runtimes
-with app.app_context():
-    StudentAnswer.__table__.drop(db.engine, checkfirst=True)
-    Submission.__table__.drop(db.engine, checkfirst=True)
-    Question.__table__.drop(db.engine, checkfirst=True)
-    Result.__table__.drop(db.engine, checkfirst=True)
-    Paper.__table__.drop(db.engine, checkfirst=True)
 
-    Paper.__table__.create(db.engine)
-    Question.__table__.create(db.engine)
-    Submission.__table__.create(db.engine)
-    StudentAnswer.__table__.create(db.engine)
-    Result.__table__.create(db.engine)
 
 
 @app.route("/")
