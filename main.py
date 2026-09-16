@@ -161,7 +161,7 @@ def newQuestionPaper():
         title = request.form.get("title")
         password = request.form.get("password")
         timelimitdate = request.form.get("timelimitdate")
-        if timelimitate:
+        if timelimitdate:
             timelimitdate = request.form.get("timelimitdate").split("-")
             timelimitdate = date(year=int(timelimitdate[0]), month=int(timelimitdate[1]), day=int(timelimitdate[2]))
         else:
