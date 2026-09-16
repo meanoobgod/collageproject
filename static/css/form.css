@@ -50,6 +50,7 @@ main {
 }
 
 .card input[type="text"],
+.card input[type="password"],
 .card textarea {
     padding: 8px 10px;
     border: 1px solid black;
