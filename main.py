@@ -249,6 +249,8 @@ def exam(paper_id):
             calculated_score = getScore(user_ans, correct_ans[0])
             if(calculated_score >= 0.85):
                 studentScore += correct_ans[1]
+            elif (calculated_score >= 60):
+                studentScore += correct_ans[1] / 2
             else:
                 studentScore += 0
             #print(calculated_score)
