@@ -14,15 +14,19 @@ class Engine():
         #Setup everything
         nltk_data_dir = "/tmp/nltk_data"
         os.makedirs(nltk_data_dir, exist_ok=True)
-        nltk.data.path.append(nltk_data_dir)
+        if nltk_data_dir not in nltk.data.path:
+            nltk.data.path.append(nltk_data_dir)
         
-        # Download required packages safely on startup if not present
-        for package in ["punkt", "stopwords"]:
+        # Safely check and download required NLTK packages with correct categories
+        # Note: punkt is a tokenizer, stopwords is a corpus
+        nltk_requirements = [("punkt", "tokenizers"), ("stopwords", "corpora")]
+        
+        for package, category in nltk_requirements:
             try:
-                nltk.data.find(f"tokenizers/{package}")
+                nltk.data.find(f"{category}/{package}")
             except LookupError:
                 nltk.download(package, download_dir=nltk_data_dir, quiet=True)
-                
+        
         self.LogginfLevel = LoggingLevel
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         model_dir = os.path.join(BASE_DIR, "model")
