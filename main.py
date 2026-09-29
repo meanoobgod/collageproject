@@ -7,9 +7,10 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from sqlalchemy import text
 
-from app.GetScore import getScore
+from app.Engine import Engine
 
 app = Flask(__name__)
+Engine = Engine() #setup engine
 
 # --- PostgreSQL Database Configuration ---
 DATABASE_URL = (
@@ -243,16 +244,11 @@ def exam(paper_id):
         print(request.form)
         correct_answers = {q.id: (q.correct_answer, q.marks) for q in questions_list}
         #print(request.form.items)
+        studentScore = 0
         for q_id, correct_ans in correct_answers.items():
             #print(q_id)
             user_ans = request.form.get(str(q_id), "")
-            calculated_score = getScore(user_ans, correct_ans[0])
-            if(calculated_score >= 0.85):
-                studentScore += correct_ans[1]
-            elif (calculated_score >= 60):
-                studentScore += correct_ans[1] / 2
-            else:
-                studentScore += 0
+            studentScore += Engine.MarkQuestion(user_ans, correct_ans[0])
             #print(calculated_score)
 
             answer_entry = StudentAnswer(
