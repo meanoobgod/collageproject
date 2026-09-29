@@ -12,6 +12,17 @@ from rake_nltk import Rake #add this to githib pyproject.toml rake-nltk
 class Engine():
     def __init__(self, LoggingLevel=False):
         #Setup everything
+        nltk_data_dir = "/tmp/nltk_data"
+        os.makedirs(nltk_data_dir, exist_ok=True)
+        nltk.data.path.append(nltk_data_dir)
+        
+        # Download required packages safely on startup if not present
+        for package in ["punkt", "stopwords"]:
+            try:
+                nltk.data.find(f"tokenizers/{package}")
+            except LookupError:
+                nltk.download(package, download_dir=nltk_data_dir, quiet=True)
+                
         self.LogginfLevel = LoggingLevel
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         model_dir = os.path.join(BASE_DIR, "model")
