@@ -5,3 +5,4 @@ onnxscript;
 brotli;
 transformers;
 torch;
+nltk;
