@@ -248,8 +248,9 @@ def exam(paper_id):
         for q_id, correct_ans in correct_answers.items():
             #print(q_id)
             user_ans = request.form.get(str(q_id), "")
-            studentScore += Engine.MarkQuestion(user_ans, correct_ans[0])
+            studentScore += Engine.MarkQuestion(total_marks=correct_ans[1], student_answer=user_ans, teacher_answer=correct_ans[0])
             #print(calculated_score)
+            #print(correct_ans)
 
             answer_entry = StudentAnswer(
                 submission_id=submission.id,
