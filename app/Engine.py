@@ -6,12 +6,11 @@ import nltk
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from rake_nltk import Rake #add this to githib pyproject.toml rake-nltk
-
+from rake_nltk import Rake  # or rake_nltk
 
 class Engine():
     def __init__(self, LoggingLevel=False):
-        #Setup everything
+        # Setup writable NLTK directory for Vercel
         nltk_data_dir = "/tmp/nltk_data"
         os.makedirs(nltk_data_dir, exist_ok=True)
         if nltk_data_dir not in nltk.data.path:
@@ -19,15 +18,18 @@ class Engine():
         
         # Safely check and download required NLTK packages with correct categories
         # Note: punkt is a tokenizer, stopwords is a corpus
-        nltk_requirements = [("punkt", "tokenizers"), ("stopwords", "corpora")]
+        nltk_requirements = [
+            ("punkt", "tokenizers"),
+            ("stopwords", "corpora")
+        ]
         
         for package, category in nltk_requirements:
             try:
                 nltk.data.find(f"{category}/{package}")
             except LookupError:
                 nltk.download(package, download_dir=nltk_data_dir, quiet=True)
-        
-        self.LogginfLevel = LoggingLevel
+                
+        self.LoggingLevel = LoggingLevel
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
         model_dir = os.path.join(BASE_DIR, "model")
 
@@ -43,25 +45,18 @@ class Engine():
 
         self.tokenizer = Tokenizer.from_file(tokenizer_path)
 
-        # 3. Disable telemetry natively via SessionOptions
+        # Disable telemetry natively via SessionOptions
         opts = ort.SessionOptions()
-
-        # Keep ONNX Runtime graph optimizations enabled
         opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-
-        # Do NOT disable CPU memory arena.
-        # It improves repeated inference performance.
-
-        # CPU threading
         opts.intra_op_num_threads = 8
         opts.inter_op_num_threads = 1
 
-        self.session = ort.InferenceSession(onnx_path,sess_options=opts,providers=["CPUExecutionProvider"])
+        self.session = ort.InferenceSession(onnx_path, sess_options=opts, providers=["CPUExecutionProvider"])
 
         # Cache input names instead of checking them every inference
         self.input_names = {x.name for x in self.session.get_inputs()}
 
-        # Cache stopwords instead of loading them every call
+        # Cache stopwords and stemmer
         self.stop_words = set(stopwords.words('english'))
         self.stemmer = PorterStemmer()
 
