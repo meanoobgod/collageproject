@@ -197,7 +197,7 @@ class Engine():
 
 
     
-    def MarkQuestion(self, total_marks: int | float, parent: str, keywords: list, keyphrase: list = []):
+    def MarkQuestion(self, total_marks: int | float,teacher_answer:str, student_answer: str):#, keywords: list, keyphrase: list = []):
         """
             How to score a text with the keywords and keyPhrase
             `Keyword`: single word simple fussy search will return the values, x% > full; y%> half else: 0
@@ -205,13 +205,20 @@ class Engine():
 
             return the mean of both of the values.
         """
-
+        if len(teacher_answer.replace("\n", " ").split(" ")) <= 200:
+            if self.getScore(teacher_answer, student_answer) >= 0.80:
+                return total_marks
+            else:
+                return 0
+            
+        keywords = self.getKeywords(teacher_answer)
+        keyphrase = self.getKeyphrases(teacher_answer)
         #only have to check paper with keywords
-        kws = self.searchKeywords(parent, keywords)
+        kws = self.searchKeywords(student_answer, keywords)
 
         if len(keyphrase) != 0:
             #has to check paper with keywords + keyphrase
-            kps = self.searchKeyPhrase(parent, keyphrase)
+            kps = self.searchKeyPhrase(student_answer, keyphrase)
             
             return total_marks * (kws + kps) / 2 # mean value of both the results
 
