@@ -11,23 +11,21 @@ from rake_nltk import Rake  # or rake_nltk
 class Engine():
     def __init__(self, LoggingLevel=False):
         # Setup writable NLTK directory for Vercel
-        nltk_data_dir = "/corpus/collageproject/corpus"
-        os.makedirs(nltk_data_dir, exist_ok=True)
+        # Get absolute path to the directory where Engine.py lives (/var/task/app)
+        APP_DIR = os.path.dirname(os.path.abspath(__file__))
+        
+        # Navigate to your project root and point to your relative corpus folder
+        # Adjust '..' if corpus/ is at the same level as main.py
+        PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, ".."))
+        nltk_data_dir = os.path.join(PROJECT_ROOT, "corpus", "collageproject", "corpus")
+        
+        # Insert at position 0 so NLTK searches here FIRST
         if nltk_data_dir not in nltk.data.path:
-            nltk.data.path.append(nltk_data_dir)
-        
-        # Safely check and download required NLTK packages with correct categories
-        # Note: punkt is a tokenizer, stopwords is a corpus
-        nltk_requirements = [
-            ("punkt", "tokenizers"),
-            ("stopwords", "corpora")
-        ]
-        
-        for package, category in nltk_requirements:
-            try:
-                nltk.data.find(f"{category}/{package}")
-            except LookupError:
-                nltk.download(package, download_dir=nltk_data_dir, quiet=True)
+            nltk.data.path.insert(0, nltk_data_dir)
+
+        # Verify the path exists to catch folder structure issues during deployment
+        if not os.path.exists(nltk_data_dir):
+            raise FileNotFoundError(f"Custom NLTK corpus path not found at: {nltk_data_dir}")
                 
         self.LoggingLevel = LoggingLevel
         BASE_DIR = os.path.dirname(os.path.abspath(__file__))
