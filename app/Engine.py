@@ -223,7 +223,7 @@ class Engine():
         #only have to check paper with keywords
         kws = self.searchKeywords(student_answer, keywords)
         if len(keyphrase) != 0:
-            for kpi in range(len(keyphrase):
+            for kpi in range(len(keyphrase)):
                 keyphrase[kpi] = self.clean_text(keyphrase[kpi])
         if len(keyphrase) != 0:
             
