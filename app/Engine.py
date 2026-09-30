@@ -11,7 +11,7 @@ from rake_nltk import Rake  # or rake_nltk
 class Engine():
     def __init__(self, LoggingLevel=False):
         # Setup writable NLTK directory for Vercel
-        nltk_data_dir = "/collageproject/corpus"
+        nltk_data_dir = "/corpus/collageproject/corpus"
         os.makedirs(nltk_data_dir, exist_ok=True)
         if nltk_data_dir not in nltk.data.path:
             nltk.data.path.append(nltk_data_dir)
