@@ -202,6 +202,8 @@ class Engine():
             return the mean of both of the values.
         """
         if len(teacher_answer.replace("\n", " ").split(" ")) <= 50:
+            if self.LoggingLevel:
+                print("[Short answer]")
             if self.getScore(teacher_answer, student_answer) >= 0.70:
                 return total_marks
             else:
