@@ -16,7 +16,7 @@ from nltk.tokenize import word_tokenize
 from rake_nltk import Rake
 
 class Engine():
-    def __init__(self, LoggingLevel=False):
+    def __init__(self, LoggingLevel=True):
         self.LoggingLevel = LoggingLevel
         # Model paths relative to Engine.py
         APP_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -200,8 +200,8 @@ class Engine():
 
             return the mean of both of the values.
         """
-        if len(teacher_answer.replace("\n", " ").split(" ")) <= 200:
-            if self.getScore(teacher_answer, student_answer) >= 0.80:
+        if len(teacher_answer.replace("\n", " ").split(" ")) <= 50:
+            if self.getScore(teacher_answer, student_answer) >= 0.70:
                 return total_marks
             else:
                 return 0
@@ -216,5 +216,6 @@ class Engine():
             kps = self.searchKeyPhrase(student_answer, keyphrase)
             
             return total_marks * (kws + kps) / 2 # mean value of both the results
-
+        if self.LoggingLevel:
+            print(kws, kps)
         return total_marks * kws # if len(parent < 50 words)
