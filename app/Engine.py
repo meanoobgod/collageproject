@@ -11,7 +11,7 @@ from rake_nltk import Rake
 class Engine():
     def __init__(self, LoggingLevel=False):
         self.LoggingLevel = LoggingLevel
-        
+        nltk.data.path.append('../corpus/collageproject/corpus')
         # Model paths relative to Engine.py
         APP_DIR = os.path.dirname(os.path.abspath(__file__))
         model_dir = os.path.join(APP_DIR, "model")
