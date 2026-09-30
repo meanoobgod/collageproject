@@ -1,11 +1,15 @@
 import os
+import nltk
+# Calculate absolute path to corpus relative to Engine.py
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+CORPUS_DIR = os.path.abspath(os.path.join(APP_DIR, "..", "corpus", "collageproject", "corpus"))
+
+# Force NLTK to look in your custom directory first
+if CORPUS_DIR not in nltk.data.path:
+    nltk.data.path.insert(0, CORPUS_DIR)
 import numpy as np
 import onnxruntime as ort
 from tokenizers import Tokenizer
-import nltk
-
-nltk.data.path.append("/var/task/corpus/collageproject/corpus")
-
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
