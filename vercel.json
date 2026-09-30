@@ -1,13 +1,7 @@
 {
-  "env": {
-    "NLTK_DATA": "/var/task/corpus/collageproject/corpus"
-  },
   "functions": {
     "main.py": {
-      "includeFiles": [
-        "app/model/**",
-        "corpus/**"
-      ]
+      "includeFiles": "app/model/**"
     }
   }
 }
