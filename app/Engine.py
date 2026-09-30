@@ -218,5 +218,5 @@ class Engine():
             
             return total_marks * (kws + kps) / 2 # mean value of both the results
         if self.LoggingLevel:
-            print(kws, kps)
+            print("[Teacher_acceppted_keyword and key phrase]",kws, kps)
         return total_marks * kws # if len(parent < 50 words)
