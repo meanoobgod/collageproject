@@ -3,6 +3,9 @@ import numpy as np
 import onnxruntime as ort
 from tokenizers import Tokenizer
 import nltk
+
+nltk.data.path.apped("/var/task/corpus/collageproject/corpus/")
+
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
