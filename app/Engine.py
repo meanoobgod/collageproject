@@ -1,8 +1,8 @@
 import os
-import nltk
 import numpy as np
 import onnxruntime as ort
 from tokenizers import Tokenizer
+import nltk
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -11,42 +11,11 @@ from rake_nltk import Rake
 class Engine():
     def __init__(self, LoggingLevel=False):
         self.LoggingLevel = LoggingLevel
+        
+        # Model paths relative to Engine.py
         APP_DIR = os.path.dirname(os.path.abspath(__file__))
-        PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, ".."))
-        
-        # Path to your custom corpus
-        custom_corpus_dir = os.path.join(PROJECT_ROOT, "corpus", "collageproject", "corpus")
-        fallback_tmp_dir = "/tmp/nltk_data"
-
-        # Register custom path first
-        if os.path.exists(custom_corpus_dir):
-            if custom_corpus_dir not in nltk.data.path:
-                nltk.data.path.insert(0, custom_corpus_dir)
-            print(f"[Engine] Using local corpus path: {custom_corpus_dir}")
-        else:
-            print(f"[Engine WARNING] Custom corpus path not found: {custom_corpus_dir}")
-
-        # Always register /tmp as secondary writable directory for Vercel
-        os.makedirs(fallback_tmp_dir, exist_ok=True)
-        if fallback_tmp_dir not in nltk.data.path:
-            nltk.data.path.append(fallback_tmp_dir)
-
-        # Download missing packages automatically into /tmp if not found in custom_corpus_dir
-        required_packages = [
-            ("punkt", "tokenizers"),
-            ("stopwords", "corpora"),
-            ("punkt_tab", "tokenizers")
-        ]
-        
-        for package, category in required_packages:
-            try:
-                nltk.data.find(f"{category}/{package}")
-            except LookupError:
-                print(f"[Engine] Downloading missing package '{package}' to {fallback_tmp_dir}")
-                nltk.download(package, download_dir=fallback_tmp_dir, quiet=True)
-
-        # Model Paths
         model_dir = os.path.join(APP_DIR, "model")
+
         tokenizer_path = os.path.join(model_dir, "tokenizer.json")
         onnx_path = os.path.join(model_dir, "model.onnx")
 
@@ -61,13 +30,13 @@ class Engine():
         # ONNX Session options
         opts = ort.SessionOptions()
         opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-        opts.intra_op_num_threads = 2  # Recommended lower thread limit for serverless execution
+        opts.intra_op_num_threads = 2
         opts.inter_op_num_threads = 1
 
         self.session = ort.InferenceSession(onnx_path, sess_options=opts, providers=["CPUExecutionProvider"])
         self.input_names = {x.name for x in self.session.get_inputs()}
 
-        # Load Stopwords & Stemmer
+        # Load Stopwords & Stemmer directly (NLTK_DATA handles path lookup)
         self.stop_words = set(stopwords.words('english'))
         self.stemmer = PorterStemmer()
     
