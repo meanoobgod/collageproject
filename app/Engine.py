@@ -113,7 +113,7 @@ class Engine():
         if not keywords_to_search:
             return 0
 
-        if self.LogginfLevel:
+        if self.LoggingLevel:
             print(f"[Engine.searchKewords] % of keywords matches: {total / len(keywords_to_search)}")
 
         if total / len(keywords_to_search) >= 0.40: #change this to change the strictness of the checking
@@ -153,7 +153,7 @@ class Engine():
 
         score = total / len(keyphrase_to_search)
 
-        if self.LogginfLevel:
+        if self.LoggingLevel:
             print(f"[Engine.searchKeyPhrase] % of keyphrase matches: {score}")
             print("sentences: ", sentences)
 
@@ -172,7 +172,7 @@ class Engine():
 
         sap = list(set([x for x in RakeSearch.get_ranked_phrases() if len(x) > 4 and len(x.split()) >= 2]))
 
-        if self.LogginfLevel:
+        if self.LoggingLevel:
             print(f"[Engine.getKeyphrases] System accepect phrases: {sap}")
 
         return sap
