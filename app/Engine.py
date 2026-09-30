@@ -1,4 +1,5 @@
 import os
+import re
 import nltk
 # Calculate absolute path to corpus relative to Engine.py
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
