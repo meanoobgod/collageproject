@@ -1,40 +1,55 @@
 import os
+import nltk
 import numpy as np
 import onnxruntime as ort
 from tokenizers import Tokenizer
-import nltk
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from rake_nltk import Rake  # or rake_nltk
+from rake_nltk import Rake
 
 class Engine():
     def __init__(self, LoggingLevel=False):
-        # Setup writable NLTK directory for Vercel
-        # Get absolute path to the directory where Engine.py lives (/var/task/app)
-        APP_DIR = os.path.dirname(os.path.abspath(__file__))
-        
-        # Navigate to your project root and point to your relative corpus folder
-        # Adjust '..' if corpus/ is at the same level as main.py
-        PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, ".."))
-        nltk_data_dir = os.path.join(PROJECT_ROOT, "corpus", "collageproject", "corpus")
-        
-        # Insert at position 0 so NLTK searches here FIRST
-        if nltk_data_dir not in nltk.data.path:
-            nltk.data.path.insert(0, nltk_data_dir)
-
-        # Verify the path exists to catch folder structure issues during deployment
-        if not os.path.exists(nltk_data_dir):
-            raise FileNotFoundError(f"Custom NLTK corpus path not found at: {nltk_data_dir}")
-                
         self.LoggingLevel = LoggingLevel
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        model_dir = os.path.join(BASE_DIR, "model")
+        APP_DIR = os.path.dirname(os.path.abspath(__file__))
+        PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, ".."))
+        
+        # Path to your custom corpus
+        custom_corpus_dir = os.path.join(PROJECT_ROOT, "corpus", "collageproject", "corpus")
+        fallback_tmp_dir = "/tmp/nltk_data"
 
+        # Register custom path first
+        if os.path.exists(custom_corpus_dir):
+            if custom_corpus_dir not in nltk.data.path:
+                nltk.data.path.insert(0, custom_corpus_dir)
+            print(f"[Engine] Using local corpus path: {custom_corpus_dir}")
+        else:
+            print(f"[Engine WARNING] Custom corpus path not found: {custom_corpus_dir}")
+
+        # Always register /tmp as secondary writable directory for Vercel
+        os.makedirs(fallback_tmp_dir, exist_ok=True)
+        if fallback_tmp_dir not in nltk.data.path:
+            nltk.data.path.append(fallback_tmp_dir)
+
+        # Download missing packages automatically into /tmp if not found in custom_corpus_dir
+        required_packages = [
+            ("punkt", "tokenizers"),
+            ("stopwords", "corpora"),
+            ("punkt_tab", "tokenizers")
+        ]
+        
+        for package, category in required_packages:
+            try:
+                nltk.data.find(f"{category}/{package}")
+            except LookupError:
+                print(f"[Engine] Downloading missing package '{package}' to {fallback_tmp_dir}")
+                nltk.download(package, download_dir=fallback_tmp_dir, quiet=True)
+
+        # Model Paths
+        model_dir = os.path.join(APP_DIR, "model")
         tokenizer_path = os.path.join(model_dir, "tokenizer.json")
         onnx_path = os.path.join(model_dir, "model.onnx")
 
-        # Safety check for Vercel build log visibility
         if not os.path.exists(tokenizer_path):
             raise FileNotFoundError(f"Missing tokenizer at: {tokenizer_path}")
 
@@ -43,21 +58,18 @@ class Engine():
 
         self.tokenizer = Tokenizer.from_file(tokenizer_path)
 
-        # Disable telemetry natively via SessionOptions
+        # ONNX Session options
         opts = ort.SessionOptions()
         opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-        opts.intra_op_num_threads = 8
+        opts.intra_op_num_threads = 2  # Recommended lower thread limit for serverless execution
         opts.inter_op_num_threads = 1
 
         self.session = ort.InferenceSession(onnx_path, sess_options=opts, providers=["CPUExecutionProvider"])
-
-        # Cache input names instead of checking them every inference
         self.input_names = {x.name for x in self.session.get_inputs()}
 
-        # Cache stopwords and stemmer
+        # Load Stopwords & Stemmer
         self.stop_words = set(stopwords.words('english'))
         self.stemmer = PorterStemmer()
-
     
     def get_embeddings(self, texts: list) -> np.ndarray:
         """
