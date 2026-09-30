@@ -45,6 +45,13 @@ class Engine():
         # Load Stopwords & Stemmer directly (NLTK_DATA handles path lookup)
         self.stop_words = set(stopwords.words('english'))
         self.stemmer = PorterStemmer()
+   
+    def clean_text(self, text: str) -> str:
+        if not text:
+            return ""
+        cleaned = re.sub(r'[^\w\s]', '', text)
+        return re.sub(r'\s+', ' ', cleaned).strip()
+
     
     def get_embeddings(self, texts: list) -> np.ndarray:
         """
@@ -210,15 +217,20 @@ class Engine():
                 return 0
             
         keywords = self.getKeywords(teacher_answer)
+        for ki in range(len(keywords)):
+            keywords[ki] = self.clean_text(keywords[ki])
         keyphrase = self.getKeyphrases(teacher_answer)
         #only have to check paper with keywords
         kws = self.searchKeywords(student_answer, keywords)
-
         if len(keyphrase) != 0:
+            for kpi in range(len(keyphrase):
+                keyphrase[kpi] = self.clean_text(keyphrase[kpi])
+        if len(keyphrase) != 0:
+            
             #has to check paper with keywords + keyphrase
             kps = self.searchKeyPhrase(student_answer, keyphrase)
             
             return total_marks * (kws + kps) / 2 # mean value of both the results
         if self.LoggingLevel:
-            print("[Teacher_acceppted_keyword and key phrase]",kws, kps)
+            print("[Teacher_acceppted_keyword and key phrase]",keywords, keyphrase)
         return total_marks * kws # if len(parent < 50 words)
