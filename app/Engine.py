@@ -125,9 +125,9 @@ class Engine():
             print(f"[Engine.searchKewords] % of keywords matches: {total / len(keywords_to_search)}")
             print("[KeyWords]:student, teacher ", token_set, keywords_to_search)
 
-        if total / len(keywords_to_search) >= 0.40: #change this to change the strictness of the checking
+        if total / len(keywords_to_search) >= 0.30: #change this to change the strictness of the checking
             return 1
-        elif total / len(keywords_to_search) >= 0.25:
+        elif total / len(keywords_to_search) >= 0.20:
             return 0.5
         else:
             return 0
