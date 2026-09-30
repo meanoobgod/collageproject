@@ -115,6 +115,7 @@ class Engine():
 
         if self.LoggingLevel:
             print(f"[Engine.searchKewords] % of keywords matches: {total / len(keywords_to_search)}")
+            print("[KeyWords]: ", token_set)
 
         if total / len(keywords_to_search) >= 0.40: #change this to change the strictness of the checking
             return 1
@@ -155,7 +156,7 @@ class Engine():
 
         if self.LoggingLevel:
             print(f"[Engine.searchKeyPhrase] % of keyphrase matches: {score}")
-            print("sentences: ", sentences)
+            print("KeyPhrases: ", sentences)
 
         if score >= 0.30: #change this to change the strictness of the checking.
             return 1
