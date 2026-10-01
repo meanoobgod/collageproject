@@ -4,8 +4,11 @@
   {{ meassage_title }}
   </title>
   <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
 <body>
-  {{ message_body | safe }}
+  <div id="MessageBody">
+    {{ message_body | safe }}
+  </div>
 </body>
 </html>
