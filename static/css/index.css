@@ -89,3 +89,7 @@ main,
         border-radius: 10px;
     }
 }
+
+.MessageBody{
+    flex-direction: column !important;
+}
