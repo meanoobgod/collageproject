@@ -56,6 +56,17 @@ main,
     transform: scale(1.05);
 }
 
+
+.MessageBody {
+    background-color: rgba(255, 255, 255, 0.6);
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 30px 40px;
+    width: 90%;
+    max-width: 480px;
+    box-sizing: border-box;
+}
+
 @media (max-width: 414px){
     body{
         margin: 1px;
