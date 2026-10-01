@@ -265,8 +265,8 @@ def exam(paper_id):
         db.session.commit()
         
         return render_template(
-            message_body = (
             "message.html",
+            message_body = (
             f"<h3>Test Submitted!</h3>"
             f"<p>Thank you, {student_name}. Your answers have been saved to the database.</p>"
             f"<a href='/'>Go Home</a>"),
