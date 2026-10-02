@@ -3,8 +3,9 @@
   <title>
   {{ meassage_title }}
   </title>
-  <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='photos/temp-logo.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+  
 </head>
 <body>
   <img id="background" src="{{ url_for('static', filename='photos/horizontal-background-2.jpg') }}">
