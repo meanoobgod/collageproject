@@ -1,42 +1,31 @@
 import os
+import re
+import nltk
+# Calculate absolute path to corpus relative to Engine.py
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+CORPUS_DIR = os.path.abspath(os.path.join(APP_DIR, "..", "corpus", "collageproject", "corpus"))
+
+# Force NLTK to look in your custom directory first
+if CORPUS_DIR not in nltk.data.path:
+    nltk.data.path.insert(0, CORPUS_DIR)
 import numpy as np
 import onnxruntime as ort
 from tokenizers import Tokenizer
-import nltk
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
-from rake_nltk import Rake  # or rake_nltk
+from rake_nltk import Rake
 
 class Engine():
-    def __init__(self, LoggingLevel=False):
-        # Setup writable NLTK directory for Vercel
-        nltk_data_dir = "/tmp/nltk_data"
-        os.makedirs(nltk_data_dir, exist_ok=True)
-        if nltk_data_dir not in nltk.data.path:
-            nltk.data.path.append(nltk_data_dir)
-        
-        # Safely check and download required NLTK packages with correct categories
-        # Note: punkt is a tokenizer, stopwords is a corpus
-        nltk_requirements = [
-            ("punkt", "tokenizers"),
-            ("stopwords", "corpora")
-        ]
-        
-        for package, category in nltk_requirements:
-            try:
-                nltk.data.find(f"{category}/{package}")
-            except LookupError:
-                nltk.download(package, download_dir=nltk_data_dir, quiet=True)
-                
+    def __init__(self, LoggingLevel=True):
         self.LoggingLevel = LoggingLevel
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        model_dir = os.path.join(BASE_DIR, "model")
+        # Model paths relative to Engine.py
+        APP_DIR = os.path.dirname(os.path.abspath(__file__))
+        model_dir = os.path.join(APP_DIR, "model")
 
         tokenizer_path = os.path.join(model_dir, "tokenizer.json")
         onnx_path = os.path.join(model_dir, "model.onnx")
 
-        # Safety check for Vercel build log visibility
         if not os.path.exists(tokenizer_path):
             raise FileNotFoundError(f"Missing tokenizer at: {tokenizer_path}")
 
@@ -45,20 +34,24 @@ class Engine():
 
         self.tokenizer = Tokenizer.from_file(tokenizer_path)
 
-        # Disable telemetry natively via SessionOptions
+        # ONNX Session options
         opts = ort.SessionOptions()
         opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-        opts.intra_op_num_threads = 8
+        opts.intra_op_num_threads = 2
         opts.inter_op_num_threads = 1
 
         self.session = ort.InferenceSession(onnx_path, sess_options=opts, providers=["CPUExecutionProvider"])
-
-        # Cache input names instead of checking them every inference
         self.input_names = {x.name for x in self.session.get_inputs()}
 
-        # Cache stopwords and stemmer
+        # Load Stopwords & Stemmer directly (NLTK_DATA handles path lookup)
         self.stop_words = set(stopwords.words('english'))
         self.stemmer = PorterStemmer()
+   
+    def clean_text(self, text: str) -> str:
+        if not text:
+            return ""
+        cleaned = re.sub(r'[^\w\s]', '', text)
+        return re.sub(r'\s+', ' ', cleaned).strip()
 
     
     def get_embeddings(self, texts: list) -> np.ndarray:
@@ -128,12 +121,13 @@ class Engine():
         if not keywords_to_search:
             return 0
 
-        if self.LogginfLevel:
+        if self.LoggingLevel:
             print(f"[Engine.searchKewords] % of keywords matches: {total / len(keywords_to_search)}")
+            print("[KeyWords]:student, teacher ", token_set, keywords_to_search)
 
-        if total / len(keywords_to_search) >= 0.40: #change this to change the strictness of the checking
+        if total / len(keywords_to_search) >= 0.30: #change this to change the strictness of the checking
             return 1
-        elif total / len(keywords_to_search) >= 0.25:
+        elif total / len(keywords_to_search) >= 0.20:
             return 0.5
         else:
             return 0
@@ -168,9 +162,9 @@ class Engine():
 
         score = total / len(keyphrase_to_search)
 
-        if self.LogginfLevel:
+        if self.LoggingLevel:
             print(f"[Engine.searchKeyPhrase] % of keyphrase matches: {score}")
-            print("sentences: ", sentences)
+            print("KeyPhrases:student, teacher ", sentences, keyphrase_to_search)
 
         if score >= 0.30: #change this to change the strictness of the checking.
             return 1
@@ -187,7 +181,7 @@ class Engine():
 
         sap = list(set([x for x in RakeSearch.get_ranked_phrases() if len(x) > 4 and len(x.split()) >= 2]))
 
-        if self.LogginfLevel:
+        if self.LoggingLevel:
             print(f"[Engine.getKeyphrases] System accepect phrases: {sap}")
 
         return sap
@@ -215,21 +209,29 @@ class Engine():
 
             return the mean of both of the values.
         """
-        if len(teacher_answer.replace("\n", " ").split(" ")) <= 200:
-            if self.getScore(teacher_answer, student_answer) >= 0.80:
+        if len(teacher_answer.replace("\n", " ").split(" ")) <= 100:
+            if self.LoggingLevel:
+                print("[Short answer]")
+            if self.getScore(teacher_answer, student_answer) >= 0.85:
                 return total_marks
             else:
                 return 0
             
         keywords = self.getKeywords(teacher_answer)
+        for ki in range(len(keywords)):
+            keywords[ki] = self.clean_text(keywords[ki])
         keyphrase = self.getKeyphrases(teacher_answer)
         #only have to check paper with keywords
         kws = self.searchKeywords(student_answer, keywords)
-
         if len(keyphrase) != 0:
+            for kpi in range(len(keyphrase)):
+                keyphrase[kpi] = self.clean_text(keyphrase[kpi])
+        if len(keyphrase) != 0:
+            
             #has to check paper with keywords + keyphrase
             kps = self.searchKeyPhrase(student_answer, keyphrase)
             
             return total_marks * (kws + kps) / 2 # mean value of both the results
-
+        if self.LoggingLevel:
+            print("[Teacher_acceppted_keyword and key phrase]",keywords, keyphrase)
         return total_marks * kws # if len(parent < 50 words)

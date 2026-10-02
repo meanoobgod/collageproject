@@ -127,7 +127,12 @@ def GetResultTeacher():
         password = arguments.get("password")
         paper_list = (Paper.query.filter_by(paper_id=paper_id, password= password).all())
         if(len(paper_list) == 0):
-            return "<h1 style='background: black; color: white;'>No Record found Found, either the paper id is invalid or you forgot your password</h1>"
+            return render_template(
+            "message.html",
+            message_body = "<h1 style='background: black; color: white;'>No Record found Found, either the paper id is invalid or you forgot your password</h1>",
+            message_title = "Error"
+        )
+            
         else:
             student_results = db.session.execute(text("Select * from result where paper_id= :paper_id"), {"paper_id": paper_id}).mappings().all()
             return render_template(
@@ -189,13 +194,18 @@ def newQuestionPaper():
                 db.session.add(question_entry)
 
         db.session.commit()
-
-        return (
+        
+        return render_template(
+            "message.html",
+            message_body = (
             f"<h3>Paper Created Successfully!</h3>"
             f"<p>Give this Paper ID to your students: "
             f"<b><a href='/student?paper_id={paper_id}'>{paper_id}</a></b></p><br>"
             f"<a href='/'>Go Home</a>"
+        ),
+            message_title = "Page Created"
         )
+        
 
     return render_template("new_paper.html")
 
@@ -218,7 +228,11 @@ def student_portal():
                 url_for("exam", paper_id=paper_id, student_name=student_name)
             )
         else:
-            return "<h3>Error: Invalid Paper ID</h3><a href='/student'>Try Again</a>"
+            return render_template(
+            "message.html",
+            message_body = "<h3>Error: Invalid Paper ID</h3><a href='/student'>Try Again</a>",
+            message_title = "Error"
+        )
 
     return render_template(
         "student_portal.html", student_name=student_name, paper_id=paper_id
@@ -241,7 +255,7 @@ def exam(paper_id):
         submission = Submission(paper_id=paper_id, student_name=student_name)
         db.session.add(submission)
         db.session.flush()
-        print(request.form)
+        #print(request.form)
         correct_answers = {q.id: (q.correct_answer, q.marks) for q in questions_list}
         #print(request.form.items)
         studentScore = 0
@@ -263,10 +277,14 @@ def exam(paper_id):
         result_entry = Result(rollno=student_name, score=studentScore, paper_id=paper_id)
         db.session.add(result_entry)
         db.session.commit()
-        return (
+        
+        return render_template(
+            "message.html",
+            message_body = (
             f"<h3>Test Submitted!</h3>"
             f"<p>Thank you, {student_name}. Your answers have been saved to the database.</p>"
-            f"<a href='/'>Go Home</a>"
+            f"<a href='/'>Go Home</a>"),
+            message_title = "Student Submitted their answer."
         )
 
     formatted_questions = [

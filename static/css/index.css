@@ -1,5 +1,9 @@
 body {
     margin: 0;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
     height: 100vh;
     margin: 3%;
     margin-top: 3px;
@@ -17,7 +21,7 @@ body {
     filter: blur(5px);
     z-index: -1;
 }
-main {
+main{
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -26,7 +30,8 @@ main {
 }
 
 #Teacher-Space,
-#Student-Space {
+#Student-Space,
+.MessageBody{
     border: 1px solid black;
     width: 70%;
     height: 70%;
@@ -40,17 +45,25 @@ main {
 
 
 #Teacher-Space a,
-#Student-Space a {
+#Student-Space a{
     color: black;
     text-decoration: none;
     font-size: 24px;
     font-weight: bold;
 }
 
+.MessageBody a{
+    color: red;
+    font-size: 24px;
+    font-weight: bold;
+}
+
 #Teacher-Space:hover,
-#Student-Space:hover {
+#Student-Space:hover,
+.MessageBody:hover{
     transform: scale(1.05);
 }
+
 
 @media (max-width: 414px){
     body{
@@ -60,7 +73,8 @@ main {
         flex-direction: column;
     }
     #Teacher-Space,
-    #Student-Space {
+    #Student-Space,
+    .MessageBody {
         border: 1px solid black;
         width: 50%;
         height: 30%;
@@ -72,4 +86,8 @@ main {
         
         border-radius: 10px;
     }
+}
+
+.MessageBody{
+    flex-direction: column !important;
 }
