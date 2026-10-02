@@ -1,5 +1,9 @@
 body {
     margin: 0;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
     height: 100vh;
     margin: 3%;
     margin-top: 3px;
@@ -59,7 +63,6 @@ main{
 .MessageBody:hover{
     transform: scale(1.05);
 }
-
 
 
 @media (max-width: 414px){
