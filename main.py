@@ -10,7 +10,7 @@ from sqlalchemy import text
 from app.Engine import Engine
 
 app = Flask(__name__)
-Engine = Engine() #setup engine
+Engine = Engine(LoggingLevel=True) #setup engine
 
 # --- PostgreSQL Database Configuration ---
 DATABASE_URL = (
